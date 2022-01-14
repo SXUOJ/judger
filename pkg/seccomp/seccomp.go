@@ -1,0 +1,3 @@
+//Package seccomp
+
+package seccomp
