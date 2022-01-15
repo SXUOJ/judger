@@ -2,17 +2,28 @@
 
 package cgroup
 
+import "errors"
+
 type Cgroup interface {
-	SetCPUQuota() error
-	SetCPUSet() error
-	SetMemoryLimit() error
-	SetProcLimit() error
+	SetCPUSet(string) error
+	SetCPUQuota(uint64, uint64) error
+	SetMemoryLimit(uint64) error
+	SetProcLimit(uint64) error
 
-	AddProc() error
+	AddProc(uint64) error
 
+	CPUUsage() (uint64, error)
 	MemoryUsage() (uint64, error)
 	MemoryMaxUsage() (uint64, error)
-	CPUUsage() (uint64, error)
 
 	Destroy() error
 }
+
+const (
+	basePathV2  = "/sys/fs/cgroup"
+	cgroupProcs = "cgroup.procs"
+)
+
+var (
+	ErrNotExistence = errors.New("This path not exist")
+)
