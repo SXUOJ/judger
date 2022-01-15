@@ -5,7 +5,28 @@ import (
 )
 
 //Does the file exist
-func FileExist(path string) bool {
+func fileExist(path string) bool {
 	_, err := os.Lstat(path)
 	return !os.IsNotExist(err)
+}
+
+//Write text to file
+func writeFile(path string, text []byte) error {
+	err := os.WriteFile(path, text, 0644)
+	return err
+}
+
+func readFile(path string) ([]byte, error) {
+	text, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	return text, nil
+}
+
+func remove(path string) error {
+	if path != "" {
+		return os.Remove(path)
+	}
+	return nil
 }
