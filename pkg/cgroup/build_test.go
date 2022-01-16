@@ -1,6 +1,7 @@
 package cgroup
 
 import (
+	"log"
 	"testing"
 	"time"
 )
@@ -25,7 +26,7 @@ func TestNewBuilder(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := cg.SetMemoryLimit(256); err != nil {
+	if err := cg.SetMemoryLimit(256 * 1024 * 1024); err != nil {
 		t.Fatal(err)
 	}
 
@@ -48,5 +49,6 @@ func TestNewBuilder(t *testing.T) {
 	if _, err := cg.MemoryMaxUsage(); err != nil {
 		t.Fatal(err)
 	}
-	time.Sleep(5000 * time.Millisecond)
+	log.Println("start sleep")
+	time.Sleep(500000 * time.Millisecond)
 }

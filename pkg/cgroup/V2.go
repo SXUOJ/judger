@@ -3,7 +3,6 @@ package cgroup
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"os"
 	"path"
 	"strconv"
@@ -61,13 +60,7 @@ func (c *CgroupV2) MemoryUsage() (uint64, error) {
 
 //TODO:memory status
 func (c *CgroupV2) MemoryMaxUsage() (uint64, error) {
-	content, err := c.ReadFile("memory.stat")
-	if err != nil {
-		return 0, err
-	}
-
-	fmt.Printf("%v", content)
-	return 0, nil
+	return 0, ErrNotExistence
 }
 
 func (c *CgroupV2) Destroy() error {
