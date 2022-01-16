@@ -65,7 +65,7 @@ func (builder *Builder) buildV2(name string) (cg Cgroup, err error) {
 		}
 	}()
 
-	if err := os.Mkdir(path, 0755); err != nil {
+	if err := os.Mkdir(path, dirPerm); err != nil {
 		return nil, err
 	}
 

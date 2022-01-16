@@ -22,6 +22,9 @@ type Cgroup interface {
 const (
 	basePathV2  = "/sys/fs/cgroup"
 	cgroupProcs = "cgroup.procs"
+
+	filePerm = 0644
+	dirPerm  = 0755
 )
 
 var (

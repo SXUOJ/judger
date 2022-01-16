@@ -12,7 +12,7 @@ func fileExist(path string) bool {
 
 //Write text to file
 func writeFile(path string, text []byte) error {
-	err := os.WriteFile(path, text, 0644)
+	err := os.WriteFile(path, text, filePerm)
 	return err
 }
 
