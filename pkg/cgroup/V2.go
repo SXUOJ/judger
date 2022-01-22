@@ -10,6 +10,7 @@ import (
 )
 
 type CgroupV2 struct {
+	name string
 	path string
 }
 
@@ -17,17 +18,19 @@ func (c *CgroupV2) SetCPUSet(content string) error {
 	return c.WriteFile("cpuset.cpus", []byte(content))
 }
 
-func (c *CgroupV2) SetCPUQuota(max, period uint64) error {
-	content := strconv.FormatUint(max, 10) + " " + strconv.FormatUint(period, 10)
+func (c *CgroupV2) SetCPUQuota(period uint64) error {
+	content := strconv.FormatUint(period, 10)
 	return c.WriteFile("cpu.max", []byte(content))
 }
 
 func (c *CgroupV2) SetMemoryLimit(limit uint64) error {
-	return c.WriteUint("memory.max", limit)
+	content := strconv.FormatUint(limit, 10)
+	return c.WriteFile("memory.max", []byte(content))
 }
 
 func (c *CgroupV2) SetProcLimit(limit uint64) error {
-	return c.WriteUint("pids.max", limit)
+	content := strconv.FormatUint(limit, 10)
+	return c.WriteFile("pids.max", []byte(content))
 }
 
 func (c *CgroupV2) AddProc(pid uint64) error {

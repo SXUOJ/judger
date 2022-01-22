@@ -6,7 +6,7 @@ import "errors"
 
 type Cgroup interface {
 	SetCPUSet(string) error
-	SetCPUQuota(uint64, uint64) error
+	SetCPUQuota(uint64) error
 	SetMemoryLimit(uint64) error
 	SetProcLimit(uint64) error
 
@@ -17,6 +17,12 @@ type Cgroup interface {
 	MemoryMaxUsage() (uint64, error)
 
 	Destroy() error
+}
+
+type ResourceConfig struct {
+	MemoryLimit string
+	CpuSet      string
+	CpuQuota    string
 }
 
 const (
