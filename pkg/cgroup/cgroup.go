@@ -5,18 +5,14 @@ package cgroup
 import "errors"
 
 type Cgroup interface {
-	SetCPUSet(string) error
-	SetCPUQuota(uint64) error
-	SetMemoryLimit(uint64) error
-	SetProcLimit(uint64) error
+	Init(string, string) error
 
-	AddProc(uint64) error
+	// SetCPUQuota(uint64) error
+	// SetMemoryLimit(uint64) error
 
-	CPUUsage() (uint64, error)
-	MemoryUsage() (uint64, error)
-	MemoryMaxUsage() (uint64, error)
+	// AddProc(uint64) error
 
-	Destroy() error
+	// Destroy() error
 }
 
 type ResourceConfig struct {
@@ -26,8 +22,11 @@ type ResourceConfig struct {
 }
 
 const (
-	basePathV2  = "/sys/fs/cgroup"
-	cgroupProcs = "cgroup.procs"
+	basePathV2 = "/sys/fs/cgroup"
+
+	cpuPrefixV1 = "/sys/fs/cgroup/cpu/"
+	pidPrefixV1 = "/sys/fs/cgroup/pids/"
+	memPrefixV1 = "/sys/fs/cgroup/memory/"
 
 	filePerm = 0644
 	dirPerm  = 0755

@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"path/filepath"
 )
 
 type CgroupType int
@@ -44,7 +45,29 @@ func (builder *Builder) Build(name string) (Cgroup, error) {
 	}
 }
 
-func (builder *Builder) buildV1(name string) (Cgroup, error) { return nil, nil }
+func (builder *Builder) buildV1(name string) (cg Cgroup, err error) {
+	dirs := []string{
+		filepath.Join(cpuPrefixV1, name),
+		filepath.Join(pidPrefixV1, name),
+		filepath.Join(memPrefixV1, name),
+	}
+	defer func() {
+		if err != nil {
+			for _, dir := range dirs {
+				remove(dir)
+			}
+		}
+	}()
+
+	for _, dir := range dirs {
+		if err := os.MkdirAll(dir, os.ModePerm); err != nil {
+			return nil, err
+		}
+	}
+	return &CgroupV1{
+		name: name,
+	}, nil
+}
 
 func (builder *Builder) buildV2(name string) (cg Cgroup, err error) {
 	path := path.Join(basePathV2, name)

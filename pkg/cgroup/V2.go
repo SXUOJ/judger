@@ -1,12 +1,10 @@
 package cgroup
 
 import (
-	"bufio"
-	"bytes"
-	"os"
+	"log"
 	"path"
-	"strconv"
-	"strings"
+
+	"github.com/sirupsen/logrus"
 )
 
 type CgroupV2 struct {
@@ -14,91 +12,48 @@ type CgroupV2 struct {
 	path string
 }
 
-func (c *CgroupV2) SetCPUSet(content string) error {
-	return c.WriteFile("cpuset.cpus", []byte(content))
-}
+func (c *CgroupV2) Init(pid, memory string) error {
+	logrus.Info("init cgroup start")
 
-func (c *CgroupV2) SetCPUQuota(period uint64) error {
-	content := strconv.FormatUint(period, 10)
-	return c.WriteFile("cpu.max", []byte(content))
-}
-
-func (c *CgroupV2) SetMemoryLimit(limit uint64) error {
-	content := strconv.FormatUint(limit, 10)
-	return c.WriteFile("memory.max", []byte(content))
-}
-
-func (c *CgroupV2) SetProcLimit(limit uint64) error {
-	content := strconv.FormatUint(limit, 10)
-	return c.WriteFile("pids.max", []byte(content))
-}
-
-func (c *CgroupV2) AddProc(pid uint64) error {
-	return c.WriteUint("cgroup.procs", pid)
-}
-
-func (c *CgroupV2) CPUUsage() (uint64, error) {
-	content, err := c.ReadFile("cpu.stat")
-	if err != nil {
-		return 0, err
+	if err := c.setCPUQuota("10000"); err != nil {
+		log.Println("SetCPUQuota failed")
+		return err
 	}
 
-	temp := bufio.NewScanner(bytes.NewReader(content))
-	for temp.Scan() {
-		v := strings.Fields(temp.Text())
-		if len(v) == 2 && v[0] == "usage_usec" {
-			vv, err := strconv.Atoi(v[1])
-			if err != nil {
-				return 0, err
-			}
-			return uint64(vv) * 1000, nil
-		}
+	if err := c.setMemoryLimit(memory); err != nil {
+		logrus.Error("SetMemoryLimit failed")
+		return err
 	}
-	return 0, os.ErrNotExist
+
+	if err := c.addProc(pid); err != nil {
+		logrus.Error("AddProc failed")
+		return err
+	}
+
+	logrus.Info("init cgroup done")
+	return nil
 }
 
-func (c *CgroupV2) MemoryUsage() (uint64, error) {
-	return c.ReadUint("memory.current")
+func (c *CgroupV2) setCPUQuota(period string) error {
+	return c.writeFile("cpu.max", []byte(period))
 }
 
-//TODO:memory status
-func (c *CgroupV2) MemoryMaxUsage() (uint64, error) {
-	return 0, ErrNotExistence
+func (c *CgroupV2) setMemoryLimit(limit string) error {
+	return c.writeFile("memory.max", []byte(limit))
+}
+
+func (c *CgroupV2) addProc(pid string) error {
+	return c.writeFile("cgroup.procs", []byte(pid))
 }
 
 func (c *CgroupV2) Destroy() error {
 	return remove(c.path)
 }
 
-func (c *CgroupV2) WriteUint(filename string, num uint64) error {
-	return c.WriteFile(filename, []byte(strconv.FormatUint(num, 10)))
-}
-
-func (c *CgroupV2) WriteFile(filename string, content []byte) error {
+func (c *CgroupV2) writeFile(filename string, content []byte) error {
 	if c == nil || c.path == "" {
 		return ErrNotExistence
 	}
 	p := path.Join(c.path, filename)
 	return writeFile(p, content)
-}
-
-func (c *CgroupV2) ReadUint(filename string) (uint64, error) {
-	content, err := c.ReadFile(filename)
-	if err != nil {
-		return 0, err
-	}
-
-	num, err := strconv.ParseUint(strings.TrimSpace(string(content)), 10, 64)
-	if err != nil {
-		return 0, err
-	}
-	return num, nil
-}
-
-func (c *CgroupV2) ReadFile(filename string) ([]byte, error) {
-	if c == nil || filename == "" {
-		return nil, ErrNotExistence
-	}
-	path := path.Join(c.path, filename)
-	return readFile(path)
 }
