@@ -7,12 +7,7 @@ import "errors"
 type Cgroup interface {
 	Init(string, string) error
 
-	// SetCPUQuota(uint64) error
-	// SetMemoryLimit(uint64) error
-
-	// AddProc(uint64) error
-
-	// Destroy() error
+	Destroy() error
 }
 
 type ResourceConfig struct {

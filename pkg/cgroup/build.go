@@ -1,10 +1,11 @@
 package cgroup
 
 import (
-	"log"
 	"os"
 	"path"
 	"path/filepath"
+
+	"github.com/sirupsen/logrus"
 )
 
 type CgroupType int
@@ -32,7 +33,7 @@ func (builder *Builder) AddType(cgt string) *Builder {
 		builder.Type = 2
 		return builder
 	default:
-		log.Fatal("cgroup type error")
+		logrus.Error("cgroup type error")
 		return nil
 	}
 }
@@ -77,7 +78,8 @@ func (builder *Builder) buildV2(name string) (cg Cgroup, err error) {
 		}
 	}()
 
-	if err := os.Mkdir(path, dirPerm); err != nil {
+	// if err := os.Mkdir(path, dirPerm); err != nil {
+	if err := os.MkdirAll(path, os.ModePerm); err != nil {
 		return nil, err
 	}
 

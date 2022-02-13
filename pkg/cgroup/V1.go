@@ -13,37 +13,41 @@ type CgroupV1 struct {
 }
 
 func (c *CgroupV1) Init(pid, memory string) error {
-	logrus.Info("init cgroup start")
+	logrus.Info("Init cgroup start")
 
 	if err := cpuCgroup(pid, c.name); err != nil {
-		logrus.Error("cpuCgroup failed")
+		logrus.Error("func cpuCgroup() failed")
 		return err
 	}
 
 	if err := pidCgroup(pid, c.name); err != nil {
-		logrus.Error("pidCgroup failed")
+		logrus.Error("func pidCgroup() failed")
 		return err
 	}
 
 	if err := memoryCgroup(pid, c.name, memory); err != nil {
-		logrus.Error("memoryCgroup failed")
+		logrus.Error("func memoryCgroup() failed")
 		return err
 	}
 
-	logrus.Info("init cgroup done")
+	logrus.Info("Init cgroup done")
 	return nil
 }
 
-func (c *CgroupV1) Destroy() {
+func (c *CgroupV1) Destroy() error {
 	dirs := []string{
 		filepath.Join(cpuPrefixV1, c.name),
 		filepath.Join(pidPrefixV1, c.name),
 		filepath.Join(memPrefixV1, c.name),
 	}
 
+	var err error
 	for _, dir := range dirs {
-		remove(dir)
+		if err = remove(dir); err != nil {
+			logrus.Error("Remove cgroup failed")
+		}
 	}
+	return err
 }
 
 func cpuCgroup(pid, containerID string) error {
