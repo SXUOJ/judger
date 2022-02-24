@@ -19,13 +19,7 @@ func Init(newRoot string) error {
 		return err
 	}
 
-	defaultMountFlag := syscall.MS_NOEXEC | syscall.MS_NOSUID | syscall.MS_NODEV
-	syscall.Mount("proc", "/proc", "prco", uintptr(defaultMountFlag), "")
-
-	syscall.Mount("tmpfs", "/dev", "tmpfs", syscall.MS_NOSUID|syscall.MS_STRICTATIME, "mod=755")
-
-	pd, _ := os.Getwd()
-	logrus.Info("Init namespace end", pd)
+	logrus.Info("Init namespace end")
 	return nil
 }
 
