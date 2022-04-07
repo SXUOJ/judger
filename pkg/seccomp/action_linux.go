@@ -1,4 +1,4 @@
-package libseccomp
+package seccomp
 
 import (
 	seccomp "github.com/elastic/go-seccomp-bpf"

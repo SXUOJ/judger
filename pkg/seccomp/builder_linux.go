@@ -1,9 +1,8 @@
-package libseccomp
+package seccomp
 
 import (
 	"syscall"
 
-	"github.com/Sxu-Online-Judge/judge/pkg/seccomp"
 	libseccomp "github.com/elastic/go-seccomp-bpf"
 	"golang.org/x/net/bpf"
 )
@@ -13,10 +12,8 @@ type Builder struct {
 	Default      Action
 }
 
-var actTrace = libseccomp.ActionTrace
-
 // Build builds the filter
-func (b *Builder) Build() (seccomp.Filter, error) {
+func (b *Builder) Build() (Filter, error) {
 	policy := libseccomp.Policy{
 		DefaultAction: ToSeccompAction(b.Default),
 		Syscalls: []libseccomp.SyscallGroup{
@@ -25,7 +22,7 @@ func (b *Builder) Build() (seccomp.Filter, error) {
 				Names:  b.Allow,
 			},
 			{
-				Action: actTrace,
+				Action: libseccomp.ActionTrace,
 				Names:  b.Trace,
 			},
 		},
@@ -38,7 +35,7 @@ func (b *Builder) Build() (seccomp.Filter, error) {
 }
 
 // ExportBPF convert libseccomp filter to kernel readable BPF content
-func ExportBPF(filter []bpf.Instruction) (seccomp.Filter, error) {
+func ExportBPF(filter []bpf.Instruction) (Filter, error) {
 	raw, err := bpf.Assemble(filter)
 	if err != nil {
 		return nil, err

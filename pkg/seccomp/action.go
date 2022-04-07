@@ -1,4 +1,4 @@
-package libseccomp
+package seccomp
 
 type Action uint32
 
