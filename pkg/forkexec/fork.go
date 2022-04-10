@@ -2,9 +2,7 @@ package forkexec
 
 import (
 	"syscall"
-	"unsafe" // required for go:linkname.
-
-	"golang.org/x/sys/unix"
+	// required for go:linkname.
 )
 
 func (r *Runner) Start() (int, error) {
@@ -23,6 +21,10 @@ func (r *Runner) Start() (int, error) {
 	if err != nil {
 		return 0, err
 	}
+
+	pid, err1 := forkAndExecInChild(r, argv0, argv, env, workdir, p)
+
+	afterFork()
+	syscall.ForkLock.Unlock()
+	return 0, nil
 }
-
-
