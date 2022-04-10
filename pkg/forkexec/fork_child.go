@@ -37,7 +37,6 @@ func forkAndExecInChild(r *Runner, argv0 *byte, argv, env []*byte, workdir *byte
 	for {
 		syscall.RawSyscall(syscall.SYS_EXIT, uintptr(err1), 0, 0)
 	}
-	return
 }
 
 func forkAndExecInChild1(r *Runner, argv0 *byte, argv, env []*byte, workdir *byte, fd []int, nextfd int, p [2]int) (pipe int, forkError ForkError, idx int, err1 syscall.Errno) {
@@ -243,6 +242,4 @@ func forkAndExecInChild1(r *Runner, argv0 *byte, argv, env []*byte, workdir *byt
 		}
 	}
 	return pipe, FErrorExecve, 0, err1
-
-	return
 }
