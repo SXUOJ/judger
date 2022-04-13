@@ -27,9 +27,6 @@ type Runner struct {
 }
 
 type Handler interface {
-	// CheckRead(string) ptrace.TraceAction
-	// CheckWrite(string) ptrace.TraceAction
-	// CheckStat(string) ptrace.TraceAction
 	CheckSyscall(string) ptrace.TraceAction
 }
 
