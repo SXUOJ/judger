@@ -6,8 +6,8 @@ import (
 
 type Result struct {
 	Status
-	Signal int
-	Error  string
+	ExitCode int
+	Error    string
 
 	SetUpTime   time.Duration
 	RunningTime time.Duration
