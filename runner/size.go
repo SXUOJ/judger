@@ -69,18 +69,3 @@ func (s Size) MiB() uint64 {
 func (s Size) GiB() uint64 {
 	return uint64(s) >> 30
 }
-
-// Return TB by Size
-func (s Size) TiB() uint64 {
-	return uint64(s) >> 40
-}
-
-// Return PB by Size
-func (s Size) PiB() uint64 {
-	return uint64(s) >> 50
-}
-
-// Return EB by Size
-func (s Size) EiB() uint64 {
-	return uint64(s) >> 60
-}
