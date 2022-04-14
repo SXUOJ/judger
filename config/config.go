@@ -60,29 +60,7 @@ var (
 	}
 
 	// default syscalls to trace
-	defaultSyscallTraces = []string{
-		// execute file
-		"execve",
-		"execveat",
-
-		// file open
-		"open",
-		"openat",
-
-		// file delete
-		"unlink",
-		"unlinkat",
-
-		// soft link
-		"readlink",
-		"readlinkat",
-
-		// permission check
-		"lstat",
-		"stat",
-		"access",
-		"faccessat",
-	}
+	defaultSyscallTraces = []string{}
 
 	// process related syscall if allowProc enabled
 	defaultProcSyscalls = []string{"clone", "fork", "vfork", "nanosleep", "execve"}
@@ -91,7 +69,12 @@ var (
 	// workpath and arg0 have additional read / stat permission
 	runptraceConfig = map[string]ProgramConfig{
 		"default": {
-			Syscall: SyscallConfig{},
+			Syscall: SyscallConfig{
+				Trace: []string{
+					// "write",
+				},
+				Allow: []string{},
+			},
 		},
 	}
 )

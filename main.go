@@ -17,7 +17,8 @@ import (
 var (
 	showPrint   = true
 	showDetails = true
-	// showDetails    = false
+	// showPrint   = false
+	// showDetails = false
 
 	unsafe         bool
 	allowProc      = false
@@ -92,15 +93,14 @@ func start(args []string) (*runner.Result, error) {
 	}
 	printLimit(&rlimits)
 
-	actionDefault := seccomp.ActionKill
-	if showDetails {
-		actionDefault = seccomp.ActionTrace
-	}
+	// blacklist
+	actionDefault := seccomp.ActionAllow
+	// actionDefault := seccomp.ActionTrace
 
 	seccompBuilder := seccomp.Builder{
+		Default: actionDefault,
 		Allow:   allow,
 		Trace:   trace,
-		Default: actionDefault,
 	}
 	filter, err := seccompBuilder.Build()
 	if err != nil {
