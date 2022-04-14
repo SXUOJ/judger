@@ -6,8 +6,8 @@ import "github.com/Sxu-Online-Judge/judge/sandbox/handle"
 func GetConf(pType string, allowProc bool) ([]string, []string, *handle.Handler) {
 	var (
 		sc    = handle.NewSyscallCounter()
-		allow = append(append([]string{}, defaultSyscallAllows...), archSyscallAllows...)
-		trace = append(append([]string{}, defaultSyscallTraces...), archSyscallTraces...)
+		allow = append(append([]string{}, defaultSyscallAllows...))
+		trace = append(append([]string{}, defaultSyscallTraces...))
 	)
 
 	if c, o := runptraceConfig[pType]; o {
