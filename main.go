@@ -7,11 +7,11 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/Sxu-Online-Judge/judge/config"
-	"github.com/Sxu-Online-Judge/judge/pkg/rlimit"
-	"github.com/Sxu-Online-Judge/judge/pkg/seccomp"
-	"github.com/Sxu-Online-Judge/judge/runner"
-	"github.com/Sxu-Online-Judge/judge/sandbox"
+	"github.com/SXUOJ/judge/config"
+	"github.com/SXUOJ/judge/pkg/rlimit"
+	"github.com/SXUOJ/judge/pkg/seccomp"
+	"github.com/SXUOJ/judge/runner"
+	"github.com/SXUOJ/judge/sandbox"
 )
 
 var (

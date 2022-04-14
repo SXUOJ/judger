@@ -1,8 +1,6 @@
 package handle
 
-import (
-	"github.com/Sxu-Online-Judge/judge/ptrace"
-)
+import "github.com/SXUOJ/judge/ptrace"
 
 // Handler defines file access restricted handler to call the ptrace
 // safe runner

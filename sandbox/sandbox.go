@@ -3,11 +3,11 @@ package sandbox
 import (
 	"context"
 
-	"github.com/Sxu-Online-Judge/judge/pkg/forkexec"
-	"github.com/Sxu-Online-Judge/judge/pkg/rlimit"
-	"github.com/Sxu-Online-Judge/judge/pkg/seccomp"
-	"github.com/Sxu-Online-Judge/judge/ptrace"
-	"github.com/Sxu-Online-Judge/judge/runner"
+	"github.com/SXUOJ/judge/pkg/forkexec"
+	"github.com/SXUOJ/judge/pkg/rlimit"
+	"github.com/SXUOJ/judge/pkg/seccomp"
+	"github.com/SXUOJ/judge/ptrace"
+	"github.com/SXUOJ/judge/runner"
 )
 
 type Runner struct {

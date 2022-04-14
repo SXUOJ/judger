@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/Sxu-Online-Judge/judge/pkg/seccomp"
+	"github.com/SXUOJ/judge/pkg/seccomp"
 	"golang.org/x/sys/unix"
 )
 

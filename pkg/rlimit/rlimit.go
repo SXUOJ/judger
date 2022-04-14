@@ -5,7 +5,7 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/Sxu-Online-Judge/judge/runner"
+	"github.com/SXUOJ/judge/runner"
 )
 
 // RLimits defines the rlimit applied by setrlimit syscall to traced process

@@ -1,4 +1,4 @@
-module github.com/Sxu-Online-Judge/judge
+module github.com/SXUOJ/judge
 
 go 1.17
 

@@ -1,6 +1,6 @@
 package config
 
-import "github.com/Sxu-Online-Judge/judge/sandbox/handle"
+import "github.com/SXUOJ/judge/sandbox/handle"
 
 // GetConf return file access check set, syscall counter, allow and traced syscall arrays and new args
 func GetConf(pType string, allowProc bool) ([]string, []string, *handle.Handler) {

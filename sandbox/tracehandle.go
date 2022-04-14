@@ -5,8 +5,8 @@ import (
 	"os"
 	"syscall"
 
-	"github.com/Sxu-Online-Judge/judge/pkg/seccomp"
-	"github.com/Sxu-Online-Judge/judge/ptrace"
+	"github.com/SXUOJ/judge/pkg/seccomp"
+	"github.com/SXUOJ/judge/ptrace"
 )
 
 var (
