@@ -3,7 +3,7 @@ package forkexec
 import (
 	"syscall"
 
-	"github.com/Sxu-Online-Judge/judge/pkg/rlimit"
+	"github.com/SXUOJ/judge/pkg/rlimit"
 )
 
 type Runner struct {

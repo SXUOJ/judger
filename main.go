@@ -7,17 +7,18 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/Sxu-Online-Judge/judge/config"
-	"github.com/Sxu-Online-Judge/judge/pkg/rlimit"
-	"github.com/Sxu-Online-Judge/judge/pkg/seccomp"
-	"github.com/Sxu-Online-Judge/judge/runner"
-	"github.com/Sxu-Online-Judge/judge/sandbox"
+	"github.com/SXUOJ/judge/config"
+	"github.com/SXUOJ/judge/pkg/rlimit"
+	"github.com/SXUOJ/judge/pkg/seccomp"
+	"github.com/SXUOJ/judge/runner"
+	"github.com/SXUOJ/judge/sandbox"
 )
 
 var (
 	showPrint   = true
 	showDetails = true
-	// showDetails    = false
+	// showPrint   = false
+	// showDetails = false
 
 	unsafe         bool
 	allowProc      = false
@@ -92,15 +93,14 @@ func start(args []string) (*runner.Result, error) {
 	}
 	printLimit(&rlimits)
 
-	actionDefault := seccomp.ActionKill
-	if showDetails {
-		actionDefault = seccomp.ActionTrace
-	}
+	// blacklist
+	actionDefault := seccomp.ActionAllow
+	// actionDefault := seccomp.ActionTrace
 
 	seccompBuilder := seccomp.Builder{
+		Default: actionDefault,
 		Allow:   allow,
 		Trace:   trace,
-		Default: actionDefault,
 	}
 	filter, err := seccompBuilder.Build()
 	if err != nil {

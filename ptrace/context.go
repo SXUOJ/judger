@@ -32,20 +32,4 @@ func getTrapContext(pid int) (*Context, error) {
 	}, nil
 }
 
-func (c *Context) GetString(addr uintptr) string {
-	buff := make([]byte, syscall.PathMax)
-	if UseVMReadv {
-		if err := vmReadStr(c.Pid, addr, buff); err != nil {
-			// if ENOSYS, then disable this function
-			if no, ok := err.(syscall.Errno); ok {
-				if no == syscall.ENOSYS {
-					UseVMReadv = false
-				}
-			}
-		} else {
-			return string(buff[:clen(buff)])
-		}
-	}
-	syscall.PtracePeekData(c.Pid, addr, buff)
-	return string(buff[:clen(buff)])
-}
+

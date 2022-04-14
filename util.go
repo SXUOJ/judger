@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Sxu-Online-Judge/judge/pkg/rlimit"
-	"github.com/Sxu-Online-Judge/judge/runner"
+	"github.com/SXUOJ/judge/pkg/rlimit"
+	"github.com/SXUOJ/judge/runner"
 )
 
 const (

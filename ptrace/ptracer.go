@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/Sxu-Online-Judge/judge/runner"
+	"github.com/SXUOJ/judge/runner"
 	"golang.org/x/sys/unix"
 )
 
