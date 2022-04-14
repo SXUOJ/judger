@@ -25,7 +25,7 @@ const (
 
 var (
 	statusString = []string{
-		"",
+		"Success",
 		"Invalid",
 		"Time Limit Exceeded",
 		"Memory Limit Exceeded",
