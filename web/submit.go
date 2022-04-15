@@ -1,4 +1,4 @@
-package model
+package web
 
 import (
 	"github.com/SXUOJ/judge/worker"
