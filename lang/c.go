@@ -19,7 +19,6 @@ func newC(sourcePath, binaryPath string) *c {
 				"-w",
 				"-O2",
 				"-DONLINE_JUDGE",
-				"",
 			},
 			realTimeLimit: 5,
 			cpuTimeLimit:  3,

@@ -8,7 +8,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/SXUOJ/judge/model"
 	"gotest.tools/assert"
 )
 
@@ -27,7 +26,19 @@ func TestPingRoute(t *testing.T) {
 func TestSubmitRouteParameter(t *testing.T) {
 	router := loadRouter()
 
-	params := model.Submit{}
+	params := Submit{
+		SubmitID:  "001",
+		ProblemID: "SXU001",
+		FileName:  "001.c",
+		Type:      "C",
+		AllowProc: false,
+
+		TimeLimit:     1,
+		RealTimeLimit: 1,
+		MemoryLimit:   256,
+		OutputLimit:   256,
+		StackLimit:    256,
+	}
 
 	paramsByte, _ := json.Marshal(params)
 	// log.Printf("%s\n", paramsByte)

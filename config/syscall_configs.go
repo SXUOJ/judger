@@ -24,5 +24,10 @@ var (
 			},
 			Allow: []string{},
 		},
+		"C-compile": {
+			DefaultAction: seccomp.ActionAllow,
+			Trace:         []string{},
+			Allow:         []string{},
+		},
 	}
 )
