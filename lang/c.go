@@ -1,15 +1,15 @@
 package lang
 
-type C struct {
+type c struct {
 	compile
-	run
+	runArgs
 }
 
-func newC(sourcePath, binaryPath string) *C {
-	return &C{
+func newC(sourcePath, binaryPath string) *c {
+	return &c{
 		compile: compile{
-			bin: "/usr/bin/gcc",
 			args: []string{
+				"/usr/bin/gcc",
 				"-o",
 				binaryPath,
 				sourcePath,
@@ -25,41 +25,30 @@ func newC(sourcePath, binaryPath string) *C {
 			cpuTimeLimit:  3,
 			memoryLimit:   128 * 1024 * 1024,
 		},
-		run: run{
-			bin:  binaryPath,
-			args: []string{""},
-		},
+		runArgs: []string{""},
 	}
 }
 
-func (c *C) IsCompile() bool {
+func (c *c) NeedCompile() bool {
 	return true
 }
 
-func (c *C) CompileBin() string {
-	return c.compile.bin
-}
-
-func (c *C) CompileArgs() []string {
+func (c *c) CompileArgs() []string {
 	return c.compile.args
 }
 
-func (c *C) CompileRealTimeLimit() uint64 {
+func (c *c) CompileRealTimeLimit() uint64 {
 	return c.compile.realTimeLimit
 }
 
-func (c *C) CompileCpuTimeLimit() uint64 {
+func (c *c) CompileCpuTimeLimit() uint64 {
 	return c.compile.cpuTimeLimit
 }
 
-func (c *C) CompileMemoryLimit() uint64 {
+func (c *c) CompileMemoryLimit() uint64 {
 	return c.compile.memoryLimit
 }
 
-func (c *C) RunBin() string {
-	return c.run.bin
-}
-
-func (c *C) RunArgs() []string {
-	return c.run.args
+func (c *c) RunArgs() []string {
+	return c.runArgs
 }
