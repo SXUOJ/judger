@@ -1,12 +1,7 @@
 package model
 
 import (
-	"time"
-
-	"github.com/SXUOJ/judge/pkg/rlimit"
-	"github.com/SXUOJ/judge/runner"
 	"github.com/SXUOJ/judge/worker"
-	"github.com/sirupsen/logrus"
 )
 
 type Submit struct {
@@ -33,41 +28,12 @@ func (submit *Submit) Load() (*worker.Worker, error) {
 		submit.StackLimit = submit.MemoryLimit
 	}
 
-	rlimits := rlimit.RLimits{
-		CPU:         submit.TimeLimit,
-		CPUHard:     submit.RealTimeLimit,
-		FileSize:    submit.OutputLimit << 20,
-		Stack:       submit.StackLimit << 20,
-		Data:        submit.MemoryLimit << 20,
-		OpenFile:    256,
-		DisableCore: true,
-	}
-	printLimit(&rlimits)
-
-	limit := runner.Limit{
-		TimeLimit:   time.Duration(submit.TimeLimit) * time.Second,
-		MemoryLimit: runner.Size(submit.MemoryLimit << 20),
-	}
-
 	return &worker.Worker{
-		ProblemID:     submit.ProblemID,
-		SubmitID:      submit.SubmitID,
-		Type:          submit.Type,
-		RLimits:       rlimits.PrepareRLimit(),
-		Limit:         limit,
+		ProblemID: submit.ProblemID,
+		SubmitID:  submit.SubmitID,
+		Type:      submit.Type,
+
 		RealTimeLimit: submit.RealTimeLimit,
 		AllowProc:     submit.AllowProc,
 	}, nil
-}
-
-func printLimit(rl *rlimit.RLimits) {
-	logrus.Debug(
-		"\ncpu: ", rl.CPU,
-		"\ncpuHard: ", rl.CPUHard,
-		"\nfileSize: ", rl.FileSize,
-		"\nstack: ", rl.Stack,
-		"\ndata: ", rl.Data,
-		"\nopenfile: ", rl.OpenFile,
-		"\ndisableCore", rl.DisableCore,
-	)
 }
