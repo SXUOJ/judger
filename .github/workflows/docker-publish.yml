@@ -1,0 +1,33 @@
+name: Docker-Image CI
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  # REPO_URL: ccr.ccs.tencentyun.com
+  # TCR_IMAGE_URL: ccr.ccs.tencentyun.com/sxu-oj/judger
+  REPO_URL: hkccr.ccs.tencentyun.com
+  TCR_IMAGE_URL: hkccr.ccs.tencentyun.com/sxu-oj/judger
+
+jobs:
+  setup-build-publish-deploy:
+    name: Setup, Build, Publish, and Deploy
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      # Build
+      - name: Build Docker image
+        run: |
+          docker build -t ${TCR_IMAGE_URL}:latest .
+      - name: Login TCR Registry
+        run: |
+          docker login ${REPO_URL} --username=${{ secrets.REPO_USERNAME }} --password='${{ secrets.REPO_PASSWORD  }}'
+      # Push the Docker image to TCR Registry
+      - name: Publish
+        run: |
+          docker push ${TCR_IMAGE_URL}:latest
