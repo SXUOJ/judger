@@ -18,19 +18,19 @@ import (
 )
 
 var (
-	showDetails bool
-	unSafe      bool
-	baseDir     = "/tmp"
-	sourceDir   = filepath.Join(baseDir, "source")
-	runDir      = filepath.Join(baseDir, "run")
-	sampleDir   = filepath.Join(baseDir, "sample")
+	showDetails = true
+	unSafe      = true
+	runDir      = filepath.Join("./tmp")
+	pathEnv     = "PATH=/usr/local/bin:/usr/bin:/bin"
 )
 
 type Worker struct {
 	ProblemID string
 	SubmitID  string
-	Type      string
-	WorkDir   string
+
+	FileName string
+	Type     string
+	WorkDir  string
 
 	AllowProc     bool
 	TimeLimit     uint64
@@ -41,12 +41,12 @@ type Worker struct {
 }
 
 func (worker *Worker) Run() (Results, error) {
+	worker.WorkDir = filepath.Join(runDir, worker.SubmitID)
 	var (
 		result     *Result
-		sourcePath = filepath.Join(sourceDir, worker.SubmitID)
-		binaryPath = filepath.Join(runDir, worker.SubmitID, worker.ProblemID)
+		sourcePath = filepath.Join(worker.WorkDir, worker.FileName)
+		binaryPath = filepath.Join(worker.WorkDir, worker.SubmitID)
 	)
-	worker.WorkDir = filepath.Join(runDir, worker.ProblemID)
 
 	lang, err := lang.NewLang(worker.Type, sourcePath, binaryPath)
 	if err != nil {
@@ -81,7 +81,7 @@ func (worker *Worker) load(sampleID int, lang lang.Lang) (*sandbox.Runner, error
 	if sampleID < 0 {
 		rlimits, limit := parseLimit(lang.CompileCpuTimeLimit(), lang.CompileRealTimeLimit(), 0, 0, lang.CompileMemoryLimit())
 
-		defaultAction, allow, trace, h := config.GetConf(strings.Join([]string{worker.Type, "compile"}, ""), worker.AllowProc)
+		defaultAction, allow, trace, h := config.GetConf(strings.Join([]string{worker.Type, "compile"}, "-"), worker.AllowProc)
 		seccompBuilder := seccomp.Builder{
 			Default: defaultAction,
 			Allow:   allow,
@@ -91,10 +91,10 @@ func (worker *Worker) load(sampleID int, lang lang.Lang) (*sandbox.Runner, error
 
 		return &sandbox.Runner{
 			Args: lang.CompileArgs(),
-			Env:  os.Environ(),
+			Env:  []string{pathEnv},
 			// ExecFile:    execFile,
 			// Files:       fds,
-			WorkDir:     worker.WorkDir,
+			// WorkDir:     worker.WorkDir,
 			Seccomp:     filter,
 			RLimits:     rlimits.PrepareRLimit(),
 			Limit:       limit,
