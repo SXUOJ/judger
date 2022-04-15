@@ -29,5 +29,10 @@ var (
 			Trace:         []string{},
 			Allow:         []string{},
 		},
+		"C-run": {
+			DefaultAction: seccomp.ActionAllow,
+			Trace:         []string{},
+			Allow:         []string{},
+		},
 	}
 )

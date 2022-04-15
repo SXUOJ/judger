@@ -154,7 +154,7 @@ func (worker *Worker) load(sampleID int, lang lang.Lang) (*sandbox.Runner, error
 		}, nil
 	}
 
-	defaultAction, allow, trace, h := config.GetConf(strings.Join([]string{worker.Type, "run"}, ""), worker.AllowProc)
+	defaultAction, allow, trace, h := config.GetConf(strings.Join([]string{worker.Type, "run"}, "-"), worker.AllowProc)
 
 	// limit
 	rlimits, limit := parseLimit(worker.TimeLimit, worker.RealTimeLimit, worker.OutputLimit, worker.StackLimit, worker.MemoryLimit)
