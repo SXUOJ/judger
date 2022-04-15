@@ -5,18 +5,18 @@ import (
 )
 
 type Submit struct {
-	SubmitID  string
-	ProblemID string
+	SubmitID  string `json:"submit_id"`
+	ProblemID string `json:"problem_id"`
 
 	Type      string `json:"type"`
 	AllowProc bool   `json:"allow_proc"`
 
 	// Limit
-	TimeLimit     uint64
-	RealTimeLimit uint64
-	MemoryLimit   uint64
-	OutputLimit   uint64
-	StackLimit    uint64
+	TimeLimit     uint64 `json:"time_limit"`
+	RealTimeLimit uint64 `json:"real_time_limit"`
+	MemoryLimit   uint64 `json:"memory_limit"`
+	OutputLimit   uint64 `json:"output_limit"`
+	StackLimit    uint64 `json:"stack_limit"`
 }
 
 func (submit *Submit) Load() (*worker.Worker, error) {
