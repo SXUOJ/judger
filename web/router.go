@@ -20,5 +20,7 @@ func ping(c *gin.Context) {
 }
 
 func submit(c *gin.Context) {
-
+	c.JSON(200, gin.H{
+		"msg": "pong",
+	})
 }
