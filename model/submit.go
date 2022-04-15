@@ -8,8 +8,10 @@ type Submit struct {
 	SubmitID  string `json:"submit_id"`
 	ProblemID string `json:"problem_id"`
 
-	Type      string `json:"type"`
-	AllowProc bool   `json:"allow_proc"`
+	FileName string `json:"file_name"`
+	Type     string `json:"type"`
+
+	AllowProc bool `json:"allow_proc"`
 
 	// Limit
 	TimeLimit     uint64 `json:"time_limit"`
@@ -31,9 +33,15 @@ func (submit *Submit) Load() (*worker.Worker, error) {
 	return &worker.Worker{
 		ProblemID: submit.ProblemID,
 		SubmitID:  submit.SubmitID,
-		Type:      submit.Type,
 
+		FileName:  submit.FileName,
+		Type:      submit.Type,
+		AllowProc: submit.AllowProc,
+
+		TimeLimit:     submit.TimeLimit,
 		RealTimeLimit: submit.RealTimeLimit,
-		AllowProc:     submit.AllowProc,
+		MemoryLimit:   submit.MemoryLimit,
+		OutputLimit:   submit.OutputLimit,
+		StackLimit:    submit.StackLimit,
 	}, nil
 }
