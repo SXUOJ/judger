@@ -17,7 +17,6 @@ import (
 	"github.com/SXUOJ/judge/pkg/seccomp"
 	"github.com/SXUOJ/judge/runner"
 	"github.com/SXUOJ/judge/sandbox"
-	"github.com/SXUOJ/judge/util"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
@@ -58,9 +57,9 @@ func NewRunner(worker *Worker, lang lang.Lang, c *gin.Context) (*Runner, error) 
 		sampleCount = 0
 	)
 
-	sampleCount = util.GetFileNum(outputDir)
+	sampleCount = GetFileNum(sampleDir)
 
-	if ok, err := util.PathExists(outputDir); err != nil {
+	if ok, err := PathExists(outputDir); err != nil {
 		logrus.Warn("Check if path exists failed")
 	} else {
 		if ok {
