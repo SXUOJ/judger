@@ -1,18 +1,26 @@
 package worker
 
+import "github.com/SXUOJ/judge/runner"
+
 type Status int
 
 const (
-	_ Status = iota
+	StatusNormal Status = iota
 	StatusAC
 	StatusWA
 	StatusCE
-	StatusRE
+
+	StatusRE //runtime error
+
+	// Limit Exceeded
 	StatusTLE
 	StatusMLE
 	StatusOLE
+
+	//presentation error
 	StatusPE
-	StatusSE
+
+	StatusSE //system error
 )
 
 var (
@@ -36,4 +44,26 @@ func (t Status) String() string {
 		return statusString[i]
 	}
 	return statusString[0]
+}
+
+func convertStatus(status runner.Status) Status {
+	switch status {
+	case runner.StatusNormal:
+		return StatusNormal
+	case runner.StatusInvalid,
+		runner.StatusDisallowedSyscall,
+		runner.StatusSignalled,
+		runner.StatusNonzeroExitStatus:
+		return StatusRE
+	case runner.StatusTimeLimitExceeded:
+		return StatusTLE
+	case runner.StatusMemoryLimitExceeded:
+		return StatusMLE
+	case runner.StatusOutputLimitExceeded:
+		return StatusOLE
+	case runner.StatusSystemError:
+		return StatusSE
+	default:
+		return StatusSE
+	}
 }

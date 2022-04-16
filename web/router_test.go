@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/SXUOJ/judge/worker"
 	"gotest.tools/assert"
 )
 
@@ -46,6 +47,29 @@ func TestSubmitRouteParameter(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
-	log.Println(w.Body.String())
+
+	res := struct {
+		Msg    string            `json:"msg"`
+		Result worker.RunResults `json:"result"`
+	}{}
+	json.Unmarshal(w.Body.Bytes(), &res)
+	for _, v := range res.Result {
+		printResult(&v)
+	}
+
 	assert.Equal(t, 200, w.Code)
+}
+
+func printResult(rt *worker.RunResult) {
+	log.Println(
+		"\n---------------",
+		"\nsampleId:", rt.SampleId,
+		"\nstatus:", rt.Status,
+		"\nexitCode: ", rt.ExitCode,
+		"\nerror: ", rt.Error,
+		"\ntime: ", rt.Time,
+		"\nmemory: ", rt.Memory,
+		"\nrunTime: ", rt.RunningTime,
+		"\nsetUpTime: ", rt.SetUpTime,
+	)
 }
