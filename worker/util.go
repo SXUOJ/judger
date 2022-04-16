@@ -47,7 +47,6 @@ func parseLimit(timeLimit, realTimeLimit, outputLimit, stackLimit, memoryLimit u
 		OpenFile:    256,
 		DisableCore: true,
 	}
-	printLimit(&rlimits)
 
 	limit := runner.Limit{
 		TimeLimit:   time.Duration(timeLimit) * time.Second,
