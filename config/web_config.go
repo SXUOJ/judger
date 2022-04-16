@@ -13,6 +13,11 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+var (
+	ShowDetails bool
+	UnSafe      bool
+)
+
 type WebConf struct {
 	Dev      bool   `yaml:"dev"`
 	LogLevel string `yaml:"log_level"`
@@ -55,6 +60,9 @@ func LoadConf() *WebConf {
 
 	if conf.Dev == false {
 		gin.SetMode(gin.ReleaseMode)
+	} else {
+		ShowDetails = true
+		UnSafe = true
 	}
 	return conf
 }
