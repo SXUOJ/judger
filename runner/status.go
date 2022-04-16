@@ -21,6 +21,13 @@ const (
 
 	// System Error
 	StatusSystemError // 8 system error
+
+	// for oj
+	StatusAccept            // 9 accept
+	StatusWrongAnswer       // 10 wrong answer
+	StatusCompileError      // 11 compile error
+	StatusPresentationError // 12 presentation error
+
 )
 
 var (
@@ -34,6 +41,11 @@ var (
 		"Signalled",
 		"Nonzero Exit Status",
 		"System Error",
+
+		"Accepted",
+		"Wrong Answer",
+		"Compile Error",
+		"Presentation Error",
 	}
 )
 

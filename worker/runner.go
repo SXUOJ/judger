@@ -26,7 +26,7 @@ type RunResults []RunResult
 
 type RunResult struct {
 	SampleId int `json:"sample_id"`
-	Result
+	runner.Result
 }
 
 type Runner struct {
@@ -154,9 +154,9 @@ func (runn *Runner) Run() {
 			}
 
 			if ok := runn.Compare(sampleIdStr); ok {
-				runResult.Status = StatusAC
+				runResult.Status = runner.StatusAccept
 			} else {
-				runResult.Status = StatusWA
+				runResult.Status = runner.StatusWrongAnswer
 			}
 
 		}(i + 1)
@@ -210,8 +210,8 @@ func plain(raw []byte) string {
 func convertResult(id int, res *runner.Result) *RunResult {
 	return &RunResult{
 		SampleId: id,
-		Result: Result{
-			Status: convertStatus(res.Status),
+		Result: runner.Result{
+			Status: res.Status,
 
 			SetUpTime:   res.SetUpTime,
 			RunningTime: res.RunningTime / time.Millisecond,
@@ -221,27 +221,5 @@ func convertResult(id int, res *runner.Result) *RunResult {
 			ExitCode: res.ExitCode,
 			Error:    res.Error,
 		},
-	}
-}
-
-func convertStatus(status runner.Status) Status {
-	switch status {
-	case runner.StatusNormal:
-		return StatusNormal
-	case runner.StatusInvalid,
-		runner.StatusDisallowedSyscall,
-		runner.StatusSignalled,
-		runner.StatusNonzeroExitStatus:
-		return StatusRE
-	case runner.StatusTimeLimitExceeded:
-		return StatusTLE
-	case runner.StatusMemoryLimitExceeded:
-		return StatusMLE
-	case runner.StatusOutputLimitExceeded:
-		return StatusOLE
-	case runner.StatusSystemError:
-		return StatusSE
-	default:
-		return StatusSE
 	}
 }
