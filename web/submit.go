@@ -21,10 +21,7 @@ type Submit struct {
 	CodeType   string `json:"code_type"`
 
 	// sample
-	Samples []struct {
-		In  string
-		Out string
-	}
+	Samples []Sample `json:"samples"`
 
 	AllowProc bool `json:"allow_proc"`
 
@@ -34,6 +31,11 @@ type Submit struct {
 	MemoryLimit   uint64 `json:"memory_limit"`
 	OutputLimit   uint64 `json:"output_limit"`
 	StackLimit    uint64 `json:"stack_limit"`
+}
+
+type Sample struct {
+	In  string `json:"in"`
+	Out string `json:"out"`
 }
 
 func (submit *Submit) Load() (*worker.Worker, error) {
@@ -99,22 +101,22 @@ func (submit *Submit) saveCodeAndSample(wk *worker.Worker) error {
 	}
 
 	var wg sync.WaitGroup
-	for i, v := range submit.Samples {
+	for i, sample := range submit.Samples {
 		wg.Add(1)
-		go func(id int) error {
+		go func(id int, oneSample Sample) error {
 			defer wg.Done()
 
 			sampleID := strconv.FormatInt(int64(id), 10)
 			sampleInPath := strings.Join([]string{sampleID, "in"}, ".")
 			sampleOutPath := strings.Join([]string{sampleID, "out"}, ".")
-			if err := writeFile(filepath.Join(wk.WorkDir, "sample", sampleInPath), []byte(v.In)); err != nil {
+			if err := writeFile(filepath.Join(wk.WorkDir, "sample", sampleInPath), []byte(oneSample.In)); err != nil {
 				return err
 			}
-			if err := writeFile(filepath.Join(wk.WorkDir, "sample", sampleOutPath), []byte(v.Out)); err != nil {
+			if err := writeFile(filepath.Join(wk.WorkDir, "sample", sampleOutPath), []byte(oneSample.Out)); err != nil {
 				return err
 			}
 			return nil
-		}(i + 1)
+		}(i+1, sample)
 	}
 	wg.Wait()
 

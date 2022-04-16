@@ -39,17 +39,14 @@ func TestSubmitRouteParameter(t *testing.T) {
 		}
 		`,
 		CodeType: "C",
-		Samples: []struct {
-			In  string
-			Out string
-		}{
+		Samples: []Sample{
 			{
 				In:  "1",
 				Out: "1",
 			},
 			{
 				In:  "2",
-				Out: "3",
+				Out: "2",
 			},
 		},
 
