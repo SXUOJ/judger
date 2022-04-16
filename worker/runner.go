@@ -1,6 +1,8 @@
 package worker
 
 import (
+	"bufio"
+	"bytes"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -133,17 +135,26 @@ func (runn *Runner) Run() (RunResults, error) {
 			r := runn.r
 			r.Files = fds
 			res, err := run(&r, runn.realTimeLimit)
-			if res.Status != runner.StatusNormal || err != nil {
-				logrus.Error("runByOne failed")
-			}
 			runResult.SampleId = id
-			runResult.Status = Status(res.Status)
+			runResult.Status = convertStatus(res.Status)
 			runResult.ExitCode = res.ExitCode
 			runResult.Error = res.Error
 			runResult.SetUpTime = res.SetUpTime
 			runResult.RunningTime = res.RunningTime / time.Millisecond
 			runResult.Time = res.Time / time.Millisecond
 			runResult.Memory = res.Memory >> 20
+
+			if res.Status != runner.StatusNormal || err != nil {
+				logrus.Error("runByOne failed")
+				return
+			}
+
+			if ok := runn.Compare(sampleIdStr); ok {
+				runResult.Status = StatusAC
+			} else {
+				runResult.Status = StatusWA
+			}
+
 			lock.Lock()
 			results = append(results, runResult)
 			lock.Unlock()
@@ -151,4 +162,41 @@ func (runn *Runner) Run() (RunResults, error) {
 	}
 	wg.Wait()
 	return results, nil
+}
+
+func (runn *Runner) Compare(sampleId string) bool {
+	//TODO: presentation judge
+	outPath := filepath.Join(runn.outputDir, strings.Join([]string{sampleId, ".out"}, ""))
+	ansPath := filepath.Join(runn.sampleDir, strings.Join([]string{sampleId, ".out"}, ""))
+
+	b, err := ioutil.ReadFile(ansPath)
+	if err != nil {
+		b = []byte{}
+	}
+
+	o, err := ioutil.ReadFile(outPath)
+	if err != nil {
+		o = []byte{}
+	}
+
+	ans := plain(b)
+	out := plain(o)
+	// log.Printf("ans:= %s", ans)
+	// log.Printf("out:= %s", out)
+
+	if out == ans {
+		return true
+	}
+	return false
+}
+
+func plain(raw []byte) string {
+	buf := bufio.NewScanner(bytes.NewReader(raw))
+	var b bytes.Buffer
+	newline := []byte{'\n'}
+	for buf.Scan() {
+		b.Write(bytes.TrimSpace(buf.Bytes()))
+		b.Write(newline)
+	}
+	return b.String()
 }

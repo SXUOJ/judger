@@ -48,14 +48,14 @@ func TestSubmitRouteParameter(t *testing.T) {
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
-	// res := struct {
-	// 	Msg    string            `json:"msg"`
-	// 	Result worker.RunResults `json:"result"`
-	// }{}
-	// json.Unmarshal(w.Body.Bytes(), &res)
-	// for _, v := range res.Result {
-	// 	printResult(&v)
-	// }
+	res := struct {
+		Msg    string            `json:"msg"`
+		Result worker.RunResults `json:"result"`
+	}{}
+	json.Unmarshal(w.Body.Bytes(), &res)
+	for _, v := range res.Result {
+		printResult(&v)
+	}
 
 	assert.Equal(t, 200, w.Code)
 }
