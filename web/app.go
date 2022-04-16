@@ -7,7 +7,7 @@ import (
 )
 
 type App struct {
-	Conf   *config.WebConf
+	Conf   *config.Conf
 	Router *gin.Engine
 }
 
@@ -19,6 +19,6 @@ func NewApp() *App {
 }
 
 func (app *App) Run() {
-	logrus.Print("Wechat-mall-backend runs on http://" + app.Conf.Listen)
-	app.Router.Run(app.Conf.Listen)
+	logrus.Print("Wechat-mall-backend runs on http://" + app.Conf.Web.Listen)
+	app.Router.Run(app.Conf.Web.Listen)
 }

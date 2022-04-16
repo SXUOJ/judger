@@ -18,15 +18,17 @@ var (
 	UnSafe      bool
 )
 
-type WebConf struct {
-	Dev      bool   `yaml:"dev"`
-	LogLevel string `yaml:"log_level"`
-	Listen   string `yaml:"listen"`
+type Conf struct {
+	Web struct {
+		Dev      bool   `yaml:"dev"`
+		LogLevel string `yaml:"log_level"`
+		Listen   string `yaml:"listen"`
+	} `yaml:"web"`
 }
 
-func LoadConf() *WebConf {
+func LoadConf() *Conf {
 	var (
-		conf = new(WebConf)
+		conf = new(Conf)
 	)
 	logrus.SetLevel(logrus.DebugLevel)
 	logrus.SetFormatter(&logrus.JSONFormatter{})
@@ -48,7 +50,7 @@ func LoadConf() *WebConf {
 		logrus.Fatalln(err)
 	}
 
-	err = setupLogLevel(conf.LogLevel)
+	err = setupLogLevel(conf.Web.LogLevel)
 	if err != nil {
 		logrus.Fatalln(err)
 	}
@@ -58,7 +60,7 @@ func LoadConf() *WebConf {
 		logrus.Fatalln(err)
 	}
 
-	if conf.Dev == false {
+	if conf.Web.Dev == false {
 		gin.SetMode(gin.ReleaseMode)
 	} else {
 		ShowDetails = true

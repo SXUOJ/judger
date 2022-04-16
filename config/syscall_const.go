@@ -71,10 +71,8 @@ var (
 	runptraceConfig = map[string]SyscallConfig{
 		"default": {
 			DefaultAction: seccomp.ActionAllow,
-			Trace:         []string{
-				// "write",
-			},
-			Allow: []string{},
+			Trace:         []string{},
+			Allow:         []string{},
 		},
 		"C-compile": {
 			DefaultAction: seccomp.ActionAllow,
