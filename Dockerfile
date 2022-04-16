@@ -24,6 +24,9 @@ RUN apt-get purge -y --auto-remove cmake git && \
 
 COPY --from=builder /build/judger /
 
+RUN mkdir /config
+COPY ./config/config.yaml /config/config.yaml
+
 EXPOSE 9000
 
 ENTRYPOINT ["/judger"]
