@@ -25,13 +25,31 @@ func TestPingRoute(t *testing.T) {
 }
 
 func TestSubmitRouteParameter(t *testing.T) {
+
 	router := loadRouter()
 
 	params := Submit{
-		SubmitID:  "001",
-		ProblemID: "SXU001",
-		FileName:  "001.c",
-		Type:      "C",
+		SourceCode: `
+		#include<stdio.h>
+		int main(){
+			int n;
+			scanf("%d", &n);
+			printf("%d", n);
+			return 0;
+		}
+		`,
+		CodeType: "C",
+		Samples: []Sample{
+			{
+				In:  "1",
+				Out: "1",
+			},
+			{
+				In:  "2",
+				Out: "2",
+			},
+		},
+
 		AllowProc: false,
 
 		TimeLimit:     1,

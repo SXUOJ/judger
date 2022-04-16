@@ -29,11 +29,14 @@ func submit(c *gin.Context) {
 		})
 		return
 	}
+
 	worker, err := submit.Load()
+	defer remove(worker.WorkDir)
 	if err != nil {
 		c.JSON(200, gin.H{
 			"msg": "submit.Load() failed",
 		})
 	}
 	worker.Run(c)
+	return
 }

@@ -14,7 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type CompileResult Result
+type CompileResult runner.Result
 
 type Compiler struct {
 	realTimeLimit uint64
@@ -58,7 +58,7 @@ func (compile *Compiler) Run() error {
 		compile.c.JSON(http.StatusOK, gin.H{
 			"msg": "compile error",
 			"result": CompileResult{
-				Status:      StatusCE,
+				Status:      runner.StatusCompileError,
 				SetUpTime:   res.SetUpTime,
 				RunningTime: res.RunningTime / time.Millisecond,
 				Time:        res.Time / time.Millisecond,

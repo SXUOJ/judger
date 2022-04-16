@@ -17,7 +17,6 @@ import (
 	"github.com/SXUOJ/judge/pkg/seccomp"
 	"github.com/SXUOJ/judge/runner"
 	"github.com/SXUOJ/judge/sandbox"
-	"github.com/SXUOJ/judge/util"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
@@ -26,13 +25,13 @@ type RunResults []RunResult
 
 type RunResult struct {
 	SampleId int `json:"sample_id"`
-	Result
+	runner.Result
 }
 
 type Runner struct {
+	submit_id     string
+	workDir       string
 	count         int
-	sampleDir     string
-	outputDir     string
 	realTimeLimit uint64
 	r             sandbox.Runner
 	c             *gin.Context
@@ -53,36 +52,16 @@ func NewRunner(worker *Worker, lang lang.Lang, c *gin.Context) (*Runner, error) 
 
 	// load fds
 	var (
-		sampleDir   = filepath.Join(sampleBaseDir, worker.ProblemID)
-		outputDir   = filepath.Join(worker.WorkDir)
+		sampleDir   = filepath.Join(worker.WorkDir, "sample")
 		sampleCount = 0
 	)
 
-	fileInDir, _ := ioutil.ReadDir(sampleDir)
-	for _, fi := range fileInDir {
-		if fi.IsDir() {
-			continue
-		} else {
-			sampleCount++
-		}
-	}
-
-	if ok, err := util.PathExists(outputDir); err != nil {
-		logrus.Warn("Check if path exists failed")
-	} else {
-		if ok {
-			logrus.Println("Output dir exists: ", outputDir)
-		} else {
-			if err := os.MkdirAll(outputDir, 0755); err != nil {
-				return nil, err
-			}
-		}
-	}
+	sampleCount = GetFileNum(sampleDir)
 
 	return &Runner{
+		submit_id:     worker.SubmitID,
+		workDir:       worker.WorkDir,
 		count:         sampleCount / 2,
-		sampleDir:     sampleDir,
-		outputDir:     outputDir,
 		realTimeLimit: worker.RealTimeLimit,
 		r: sandbox.Runner{
 			Args: lang.RunArgs(),
@@ -119,15 +98,17 @@ func (runn *Runner) Run() {
 				outputFileName string
 				errorFileName  string
 				files          []*os.File
+				sampleDir      = filepath.Join(runn.workDir, "sample")
+				outputDir      = filepath.Join(runn.workDir, "output")
 			)
 
 			sampleIdStr := strconv.FormatInt(int64(id), 10)
 			input := strings.Join([]string{sampleIdStr, "in"}, ".")
 			output := strings.Join([]string{sampleIdStr, "out"}, ".")
 			erroR := strings.Join([]string{sampleIdStr, "err"}, ".")
-			inputFileName = filepath.Join(runn.sampleDir, input)
-			outputFileName = filepath.Join(runn.outputDir, output)
-			errorFileName = filepath.Join(runn.outputDir, erroR)
+			inputFileName = filepath.Join(sampleDir, input)
+			outputFileName = filepath.Join(outputDir, output)
+			errorFileName = filepath.Join(outputDir, erroR)
 			files, err := prepareFiles(inputFileName, outputFileName, errorFileName)
 			if err != nil {
 				logrus.Error("failed to prepare files: %v", err)
@@ -161,9 +142,9 @@ func (runn *Runner) Run() {
 			}
 
 			if ok := runn.Compare(sampleIdStr); ok {
-				runResult.Status = StatusAC
+				runResult.Status = runner.StatusAccept
 			} else {
-				runResult.Status = StatusWA
+				runResult.Status = runner.StatusWrongAnswer
 			}
 
 		}(i + 1)
@@ -171,16 +152,21 @@ func (runn *Runner) Run() {
 	wg.Wait()
 
 	runn.c.JSON(http.StatusOK, gin.H{
-		"msg":    "ok",
-		"result": results,
+		"msg":       "ok",
+		"submit_id": runn.submit_id,
+		"result":    results,
 	})
 	return
 }
 
 func (runn *Runner) Compare(sampleId string) bool {
 	//TODO: presentation judge
-	outPath := filepath.Join(runn.outputDir, strings.Join([]string{sampleId, ".out"}, ""))
-	ansPath := filepath.Join(runn.sampleDir, strings.Join([]string{sampleId, ".out"}, ""))
+	var (
+		sampleDir = filepath.Join(runn.workDir, "sample")
+		outputDir = filepath.Join(runn.workDir, "output")
+	)
+	outPath := filepath.Join(outputDir, strings.Join([]string{sampleId, ".out"}, ""))
+	ansPath := filepath.Join(sampleDir, strings.Join([]string{sampleId, ".out"}, ""))
 
 	b, err := ioutil.ReadFile(ansPath)
 	if err != nil {
@@ -217,8 +203,8 @@ func plain(raw []byte) string {
 func convertResult(id int, res *runner.Result) *RunResult {
 	return &RunResult{
 		SampleId: id,
-		Result: Result{
-			Status: convertStatus(res.Status),
+		Result: runner.Result{
+			Status: res.Status,
 
 			SetUpTime:   res.SetUpTime,
 			RunningTime: res.RunningTime / time.Millisecond,
@@ -228,27 +214,5 @@ func convertResult(id int, res *runner.Result) *RunResult {
 			ExitCode: res.ExitCode,
 			Error:    res.Error,
 		},
-	}
-}
-
-func convertStatus(status runner.Status) Status {
-	switch status {
-	case runner.StatusNormal:
-		return StatusNormal
-	case runner.StatusInvalid,
-		runner.StatusDisallowedSyscall,
-		runner.StatusSignalled,
-		runner.StatusNonzeroExitStatus:
-		return StatusRE
-	case runner.StatusTimeLimitExceeded:
-		return StatusTLE
-	case runner.StatusMemoryLimitExceeded:
-		return StatusMLE
-	case runner.StatusOutputLimitExceeded:
-		return StatusOLE
-	case runner.StatusSystemError:
-		return StatusSE
-	default:
-		return StatusSE
 	}
 }

@@ -1,0 +1,15 @@
+version: "3"
+services:
+  judger:
+    container_name: judger
+    # image: hkccr.ccs.tencentyun.com/sxu-oj/judger
+    build:
+      context: . 
+      dockerfile: Dockerfile 
+    restart: always
+    tmpfs:
+      - /tmp
+    volumes:
+      - $PWD/log:/sxu-judger/log
+    ports:
+      - 9000:9000

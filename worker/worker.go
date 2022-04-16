@@ -16,8 +16,7 @@ import (
 )
 
 type Worker struct {
-	ProblemID string
-	SubmitID  string
+	SubmitID string
 
 	FileName string
 	Type     string
@@ -29,26 +28,12 @@ type Worker struct {
 	MemoryLimit   uint64
 	OutputLimit   uint64
 	StackLimit    uint64
+
+	compiler Compiler
+	runner   Runner
 }
 
-/*
- *|work_dir
- *|--submit_id
- *|--|--submit_id.c
- *|--|--submit_id
- *|--|--1.txt
- *|--|--2.txt
- *
- *|sample
- *|--problem_id
- *|--|--1.in
- *|--|--1.out
- *|--|--2.in
- *|--|--2.out
- */
-
 func (worker *Worker) Run(c *gin.Context) {
-	worker.WorkDir = filepath.Join(runDir, worker.SubmitID)
 	var (
 		sourcePath = filepath.Join(worker.WorkDir, worker.FileName)
 		binaryPath = filepath.Join(worker.WorkDir, worker.SubmitID)
