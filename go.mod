@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/elastic/go-seccomp-bpf v1.2.0
 	github.com/gin-gonic/gin v1.7.7
+	github.com/google/uuid v1.3.0
 	github.com/sirupsen/logrus v1.8.1
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f
 	golang.org/x/sys v0.0.0-20220319134239-a9b59b0215f8
