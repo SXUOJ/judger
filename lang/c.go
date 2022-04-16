@@ -24,7 +24,7 @@ func newC(sourcePath, binaryPath string) *c {
 			cpuTimeLimit:  3,
 			memoryLimit:   128 * 1024 * 1024,
 		},
-		runArgs: []string{""},
+		runArgs: []string{binaryPath},
 	}
 }
 
