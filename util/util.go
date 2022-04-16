@@ -2,6 +2,7 @@ package util
 
 import (
 	"bytes"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"unicode"
@@ -17,6 +18,21 @@ func PathExists(path string) (bool, error) {
 	}
 
 	return false, err
+}
+
+func GetFileNum(dir string) int {
+	var (
+		count = 0
+	)
+	fileInDir, _ := ioutil.ReadDir(dir)
+	for _, fi := range fileInDir {
+		if fi.IsDir() {
+			continue
+		} else {
+			count++
+		}
+	}
+	return count
 }
 
 func GetFileSize(filename string) int64 {

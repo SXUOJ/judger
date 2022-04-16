@@ -58,14 +58,7 @@ func NewRunner(worker *Worker, lang lang.Lang, c *gin.Context) (*Runner, error) 
 		sampleCount = 0
 	)
 
-	fileInDir, _ := ioutil.ReadDir(sampleDir)
-	for _, fi := range fileInDir {
-		if fi.IsDir() {
-			continue
-		} else {
-			sampleCount++
-		}
-	}
+	sampleCount = util.GetFileNum(outputDir)
 
 	if ok, err := util.PathExists(outputDir); err != nil {
 		logrus.Warn("Check if path exists failed")
