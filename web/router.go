@@ -35,16 +35,5 @@ func submit(c *gin.Context) {
 			"msg": "submit.Load() failed",
 		})
 	}
-
-	result, err := worker.Run()
-	if err != nil {
-		c.JSON(200, gin.H{
-			"msg": "worker.Run() failed",
-		})
-	}
-
-	c.JSON(200, gin.H{
-		"msg":    "pong",
-		"result": result,
-	})
+	worker.Run(c)
 }

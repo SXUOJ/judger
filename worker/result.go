@@ -6,17 +6,6 @@ import (
 	"github.com/SXUOJ/judge/runner"
 )
 
-type Results interface{}
-
-type CompileResult Result
-
-type RunResults []RunResult
-
-type RunResult struct {
-	SampleId int `json:"sample_id"`
-	Result
-}
-
 type Result struct {
 	Status Status `json:"status"`
 

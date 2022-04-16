@@ -2,6 +2,7 @@ package worker
 
 import (
 	"context"
+	"net/http"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -10,6 +11,7 @@ import (
 	"github.com/SXUOJ/judge/lang"
 	"github.com/SXUOJ/judge/runner"
 	"github.com/SXUOJ/judge/sandbox"
+	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
 
@@ -45,7 +47,7 @@ type Worker struct {
  *|--|--2.out
  */
 
-func (worker *Worker) Run() (Results, error) {
+func (worker *Worker) Run(c *gin.Context) {
 	worker.WorkDir = filepath.Join(runDir, worker.SubmitID)
 	var (
 		sourcePath = filepath.Join(worker.WorkDir, worker.FileName)
@@ -54,32 +56,32 @@ func (worker *Worker) Run() (Results, error) {
 
 	lang, err := lang.NewLang(worker.Type, sourcePath, binaryPath)
 	if err != nil {
-		logrus.Error("New lang failed")
-		return nil, nil
+		msg := "New lang failed"
+		errReturn(c, msg)
+		return
 	}
 
 	if lang.NeedCompile() {
-		compiler, err := NewCompiler(worker, lang)
+		compiler, err := NewCompiler(worker, lang, c)
 		if err != nil {
-			logrus.Error("New compiler failed")
-			return nil, err
+			msg := "New compiler failed"
+			errReturn(c, msg)
+			return
 		}
-		cs, err := compiler.Run()
-		if err != nil {
-			logrus.Error("Compiler run failed")
-			return cs, err
+		if err := compiler.Run(); err != nil {
+			logrus.Error(err.Error())
+			return
 		}
 	}
 
-	run, err := NewRunner(worker, lang)
-
+	run, err := NewRunner(worker, lang, c)
 	if err != nil {
-		logrus.Error("New runner failed")
-		return nil, err
+		msg := "New runner failed"
+		errReturn(c, msg)
+		return
 	}
-	rs, err := run.Run()
-
-	return rs, nil
+	run.Run()
+	return
 }
 
 func run(r *sandbox.Runner, realTimeLimit uint64) (*runner.Result, error) {
@@ -117,4 +119,11 @@ func run(r *sandbox.Runner, realTimeLimit uint64) (*runner.Result, error) {
 	}
 
 	return &rt, nil
+}
+
+func errReturn(c *gin.Context, msg string) {
+	logrus.Error(msg)
+	c.JSON(http.StatusOK, gin.H{
+		"msg": msg,
+	})
 }
