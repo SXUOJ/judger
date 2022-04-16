@@ -16,8 +16,7 @@ import (
 )
 
 type Worker struct {
-	ProblemID string
-	SubmitID  string
+	SubmitID string
 
 	FileName string
 	Type     string
@@ -35,7 +34,6 @@ type Worker struct {
 }
 
 func (worker *Worker) Run(c *gin.Context) {
-	worker.WorkDir = filepath.Join(runDir, worker.SubmitID)
 	var (
 		sourcePath = filepath.Join(worker.WorkDir, worker.FileName)
 		binaryPath = filepath.Join(worker.WorkDir, worker.SubmitID)

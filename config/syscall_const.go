@@ -74,12 +74,12 @@ var (
 			Trace:         []string{},
 			Allow:         []string{},
 		},
-		"C-compile": {
+		"c-compile": {
 			DefaultAction: seccomp.ActionAllow,
 			Trace:         []string{},
 			Allow:         []string{},
 		},
-		"C-run": {
+		"c-run": {
 			DefaultAction: seccomp.ActionAllow,
 			Trace:         []string{},
 			Allow:         []string{},
