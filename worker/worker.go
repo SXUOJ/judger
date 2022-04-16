@@ -29,23 +29,10 @@ type Worker struct {
 	MemoryLimit   uint64
 	OutputLimit   uint64
 	StackLimit    uint64
-}
 
-/*
- *|work_dir
- *|--submit_id
- *|--|--submit_id.c
- *|--|--submit_id
- *|--|--1.txt
- *|--|--2.txt
- *
- *|sample
- *|--problem_id
- *|--|--1.in
- *|--|--1.out
- *|--|--2.in
- *|--|--2.out
- */
+	compiler Compiler
+	runner   Runner
+}
 
 func (worker *Worker) Run(c *gin.Context) {
 	worker.WorkDir = filepath.Join(runDir, worker.SubmitID)
