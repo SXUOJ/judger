@@ -17,6 +17,7 @@ import (
 type CompileResult runner.Result
 
 type Compiler struct {
+	submit_id     string
 	realTimeLimit uint64
 	r             *sandbox.Runner
 	c             *gin.Context
@@ -40,7 +41,7 @@ func NewCompiler(worker *Worker, lang lang.Lang, c *gin.Context) (*Compiler, err
 			Env:  []string{pathEnv},
 			// ExecFile:    execFile,
 			// Files:       fds,
-			// WorkDir:     worker.WorkDir,
+			WorkDir:     worker.WorkDir,
 			Seccomp:     filter,
 			RLimits:     rlimits.PrepareRLimit(),
 			Limit:       limit,
@@ -56,7 +57,8 @@ func (compile *Compiler) Run() error {
 	res, err := run(compile.r, compile.realTimeLimit)
 	if err != nil || res.Status != runner.StatusNormal {
 		compile.c.JSON(http.StatusOK, gin.H{
-			"msg": "compile error",
+			"msg":       "compile error",
+			"submit_id": compile.submit_id,
 			"result": CompileResult{
 				Status:      runner.StatusCompileError,
 				SetUpTime:   res.SetUpTime,

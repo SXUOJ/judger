@@ -30,4 +30,4 @@ jobs:
       # Push the Docker image to TCR Registry
       - name: Publish
         run: |
-          docker push ${TCR_IMAGE_URL}:latest
+          docker push ${TCR_IMAGE_URL}:latest 

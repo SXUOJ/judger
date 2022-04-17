@@ -7,7 +7,7 @@ ENV GO111MODULE=on \
 
 WORKDIR /build
 COPY . .
-RUN  go build -o judger .
+RUN  go build -buildvcs=false -o judger .
 
 
 FROM ubuntu:20.04
