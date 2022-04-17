@@ -68,7 +68,7 @@ func NewRunner(worker *Worker, lang lang.Lang, c *gin.Context) (*Runner, error) 
 			Env:  os.Environ(),
 			// ExecFile: execFile,
 			// Files: fds,
-			// WorkDir:     worker.WorkDir,
+			WorkDir:     worker.WorkDir,
 			Seccomp:     filter,
 			RLimits:     rlimits.PrepareRLimit(),
 			Limit:       limit,
