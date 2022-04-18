@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/SXUOJ/judge/main/web/model"
+	"github.com/SXUOJ/judge/main/model"
 )
 
 func BenchmarkSubmit(b *testing.B) {
