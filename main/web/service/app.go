@@ -1,19 +1,19 @@
-package web
+package service
 
 import (
-	"github.com/SXUOJ/judge/config"
+	"github.com/SXUOJ/judge/main/web/env"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
 
 type App struct {
-	Conf   *config.Conf
+	Conf   *env.Conf
 	Router *gin.Engine
 }
 
 func NewApp() *App {
 	return &App{
-		Conf:   config.LoadConf(),
+		Conf:   env.LoadConf(),
 		Router: loadRouter(),
 	}
 }

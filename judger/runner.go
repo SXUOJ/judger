@@ -1,10 +1,9 @@
-package worker
+package judger
 
 import (
 	"bufio"
 	"bytes"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -28,8 +27,8 @@ type RunResult struct {
 	runner.Result
 }
 
-type Runner struct {
-	submit_id     string
+type thisRunner struct {
+	submitID      string
 	workDir       string
 	count         int
 	realTimeLimit uint64
@@ -37,11 +36,11 @@ type Runner struct {
 	c             *gin.Context
 }
 
-func NewRunner(worker *Worker, lang lang.Lang, c *gin.Context) (*Runner, error) {
-	defaultAction, allow, trace, h := config.GetConf(strings.Join([]string{worker.Type, "run"}, "-"), worker.AllowProc)
+func newRunner(submitID, codeType, workDir string, allowProc bool, slimit Limit, lang lang.Lang, c *gin.Context) *thisRunner {
+	defaultAction, allow, trace, h := config.GetConf(strings.Join([]string{codeType, "run"}, "-"), allowProc)
 
 	// limit
-	rlimits, limit := parseLimit(worker.TimeLimit, worker.RealTimeLimit, worker.OutputLimit, worker.StackLimit, worker.MemoryLimit)
+	rlimits, limit := parseLimit(slimit.TimeLimit, slimit.RealTimeLimit, slimit.OutputLimit, slimit.StackLimit, slimit.MemoryLimit)
 	// build seccomp filter
 	seccompBuilder := seccomp.Builder{
 		Default: defaultAction,
@@ -52,23 +51,21 @@ func NewRunner(worker *Worker, lang lang.Lang, c *gin.Context) (*Runner, error) 
 
 	// load fds
 	var (
-		sampleDir   = filepath.Join(worker.WorkDir, "sample")
+		sampleDir   = filepath.Join(workDir, "sample")
 		sampleCount = 0
 	)
 
-	sampleCount = GetFileNum(sampleDir)
-
-	return &Runner{
-		submit_id:     worker.SubmitID,
-		workDir:       worker.WorkDir,
+	sampleCount = getFileNum(sampleDir)
+	return &thisRunner{
+		submitID:      submitID,
+		workDir:       workDir,
 		count:         sampleCount / 2,
-		realTimeLimit: worker.RealTimeLimit,
+		realTimeLimit: slimit.RealTimeLimit,
 		r: sandbox.Runner{
 			Args: lang.RunArgs(),
-			Env:  os.Environ(),
-			// ExecFile: execFile,
-			// Files: fds,
-			WorkDir:     worker.WorkDir,
+			// Env:         []string{pathEnv},
+			Env:         os.Environ(),
+			WorkDir:     workDir,
 			Seccomp:     filter,
 			RLimits:     rlimits.PrepareRLimit(),
 			Limit:       limit,
@@ -77,29 +74,26 @@ func NewRunner(worker *Worker, lang lang.Lang, c *gin.Context) (*Runner, error) 
 			Handler:     h,
 		},
 		c: c,
-	}, nil
+	}
 }
 
-func (runn *Runner) Run() {
+func (thisRun thisRunner) Start(resChan chan interface{}, done chan bool) {
 	var (
-		wg      sync.WaitGroup
-		lock    sync.Mutex
-		results RunResults
+		wg sync.WaitGroup
 	)
 
-	for i := 0; i < runn.count; i++ {
+	for i := 0; i < thisRun.count; i++ {
 		wg.Add(1)
 		go func(id int) {
 			defer wg.Done()
-			logrus.Debug("Runner run start")
 
 			var (
 				inputFileName  string
 				outputFileName string
 				errorFileName  string
 				files          []*os.File
-				sampleDir      = filepath.Join(runn.workDir, "sample")
-				outputDir      = filepath.Join(runn.workDir, "output")
+				sampleDir      = filepath.Join(thisRun.workDir, "sample")
+				outputDir      = filepath.Join(thisRun.workDir, "output")
 			)
 
 			sampleIdStr := strconv.FormatInt(int64(id), 10)
@@ -126,44 +120,36 @@ func (runn *Runner) Run() {
 				}
 			}
 
-			r := runn.r
+			r := thisRun.r
 			r.Files = fds
-			res, err := run(&r, runn.realTimeLimit)
+			res, err := run(&r, thisRun.realTimeLimit)
 			runResult := convertResult(id, res)
-			defer func() {
-				lock.Lock()
-				results = append(results, *runResult)
-				lock.Unlock()
-			}()
 
 			if res.Status != runner.StatusNormal || err != nil {
 				logrus.Error("Program error")
-				return
+				goto quit
 			}
 
-			if ok := runn.Compare(sampleIdStr); ok {
+			if ok := thisRun.Compare(sampleIdStr); ok {
 				runResult.Status = runner.StatusAccept
 			} else {
 				runResult.Status = runner.StatusWrongAnswer
 			}
 
+		quit:
+			resChan <- runResult
+			return
 		}(i + 1)
 	}
 	wg.Wait()
-
-	runn.c.JSON(http.StatusOK, gin.H{
-		"msg":       "ok",
-		"submit_id": runn.submit_id,
-		"result":    results,
-	})
-	return
+	done <- true
 }
 
-func (runn *Runner) Compare(sampleId string) bool {
+func (thisRun *thisRunner) Compare(sampleId string) bool {
 	//TODO: presentation judge
 	var (
-		sampleDir = filepath.Join(runn.workDir, "sample")
-		outputDir = filepath.Join(runn.workDir, "output")
+		sampleDir = filepath.Join(thisRun.workDir, "sample")
+		outputDir = filepath.Join(thisRun.workDir, "output")
 	)
 	outPath := filepath.Join(outputDir, strings.Join([]string{sampleId, ".out"}, ""))
 	ansPath := filepath.Join(sampleDir, strings.Join([]string{sampleId, ".out"}, ""))

@@ -1,4 +1,4 @@
-package worker
+package judger
 
 import (
 	"io/ioutil"
@@ -10,7 +10,12 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func PathExists(path string) (bool, error) {
+func writeFile(path string, text []byte) error {
+	err := os.WriteFile(path, text, filePerm)
+	return err
+}
+
+func pathExists(path string) (bool, error) {
 	_, err := os.Stat(path)
 	if err == nil {
 		return true, nil
@@ -22,7 +27,7 @@ func PathExists(path string) (bool, error) {
 	return false, err
 }
 
-func GetFileNum(dir string) int {
+func getFileNum(dir string) int {
 	var (
 		count = 0
 	)

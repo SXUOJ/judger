@@ -1,4 +1,4 @@
-package web
+package model
 
 import (
 	"os"
@@ -7,7 +7,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/SXUOJ/judge/worker"
+	"github.com/SXUOJ/judge/judger"
 	"github.com/google/uuid"
 )
 
@@ -38,7 +38,7 @@ type Sample struct {
 	Out string `json:"out"`
 }
 
-func (submit *Submit) Load() (*worker.Worker, error) {
+func (submit *Submit) Load() (*judger.Judger, error) {
 	if submit.TimeLimit == 0 {
 		submit.TimeLimit = 1
 	}
@@ -65,8 +65,8 @@ func (submit *Submit) Load() (*worker.Worker, error) {
 	submit.CodeType = strings.ToLower(submit.CodeType)
 
 	submitID := uuid.New()
-	wk := &worker.Worker{
-		WorkDir: filepath.Join(worker.RunDir, submitID.String()),
+	jg := &judger.Judger{
+		WorkDir: filepath.Join(judger.RunDir, submitID.String()),
 
 		SubmitID: submitID.String(),
 
@@ -74,29 +74,31 @@ func (submit *Submit) Load() (*worker.Worker, error) {
 		Type:      submit.CodeType,
 		AllowProc: submit.AllowProc,
 
-		TimeLimit:     submit.TimeLimit,
-		RealTimeLimit: submit.RealTimeLimit,
-		MemoryLimit:   submit.MemoryLimit,
-		OutputLimit:   submit.OutputLimit,
-		StackLimit:    submit.StackLimit,
+		Slimit: judger.Limit{
+			TimeLimit:     submit.TimeLimit,
+			RealTimeLimit: submit.RealTimeLimit,
+			MemoryLimit:   submit.MemoryLimit,
+			OutputLimit:   submit.OutputLimit,
+			StackLimit:    submit.StackLimit,
+		},
 	}
-	if err := submit.saveCodeAndSample(wk); err != nil {
+	if err := submit.saveCodeAndSample(jg); err != nil {
 		return nil, err
 	}
 
-	return wk, nil
+	return jg, nil
 }
 
-func (submit *Submit) saveCodeAndSample(wk *worker.Worker) error {
-	if err := os.MkdirAll(wk.WorkDir, dirPerm); err != nil {
+func (submit *Submit) saveCodeAndSample(jg *judger.Judger) error {
+	if err := os.MkdirAll(jg.WorkDir, dirPerm); err != nil {
 		return err
 	}
 
-	if err := writeFile(filepath.Join(wk.WorkDir, wk.FileName), []byte(submit.SourceCode)); err != nil {
+	if err := writeFile(filepath.Join(jg.WorkDir, jg.FileName), []byte(submit.SourceCode)); err != nil {
 		return err
 	}
 
-	if err := os.MkdirAll(filepath.Join(wk.WorkDir, "sample"), dirPerm); err != nil {
+	if err := os.MkdirAll(filepath.Join(jg.WorkDir, "sample"), dirPerm); err != nil {
 		return err
 	}
 
@@ -109,10 +111,10 @@ func (submit *Submit) saveCodeAndSample(wk *worker.Worker) error {
 			sampleID := strconv.FormatInt(int64(id), 10)
 			sampleInPath := strings.Join([]string{sampleID, "in"}, ".")
 			sampleOutPath := strings.Join([]string{sampleID, "out"}, ".")
-			if err := writeFile(filepath.Join(wk.WorkDir, "sample", sampleInPath), []byte(oneSample.In)); err != nil {
+			if err := writeFile(filepath.Join(jg.WorkDir, "sample", sampleInPath), []byte(oneSample.In)); err != nil {
 				return err
 			}
-			if err := writeFile(filepath.Join(wk.WorkDir, "sample", sampleOutPath), []byte(oneSample.Out)); err != nil {
+			if err := writeFile(filepath.Join(jg.WorkDir, "sample", sampleOutPath), []byte(oneSample.Out)); err != nil {
 				return err
 			}
 			return nil
@@ -120,7 +122,7 @@ func (submit *Submit) saveCodeAndSample(wk *worker.Worker) error {
 	}
 	wg.Wait()
 
-	if err := os.MkdirAll(filepath.Join(wk.WorkDir, "output"), dirPerm); err != nil {
+	if err := os.MkdirAll(filepath.Join(jg.WorkDir, "output"), dirPerm); err != nil {
 		return err
 	}
 	return nil
@@ -129,11 +131,4 @@ func (submit *Submit) saveCodeAndSample(wk *worker.Worker) error {
 func writeFile(path string, text []byte) error {
 	err := os.WriteFile(path, text, filePerm)
 	return err
-}
-
-func remove(path string) error {
-	if path != "" {
-		return os.Remove(path)
-	}
-	return nil
 }

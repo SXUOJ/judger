@@ -1,4 +1,4 @@
-package web
+package service
 
 import (
 	"bytes"
@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/SXUOJ/judge/worker"
+	"github.com/SXUOJ/judge/main/model"
 	"gotest.tools/assert"
 )
 
@@ -25,21 +25,19 @@ func TestPingRoute(t *testing.T) {
 }
 
 func TestSubmitRouteParameter(t *testing.T) {
-
 	router := loadRouter()
 
-	params := Submit{
+	params := model.Submit{
 		SourceCode: `
-		#include<stdio.h>
-		int main(){
-			int n;
-			scanf("%d", &n);
-			printf("%d", n);
-			return 0;
-		}
-		`,
+#include<stdio.h>
+int main(){
+	int n;
+	scanf("%d", &n);
+	printf("%d", n);
+	return 0;
+}`,
 		CodeType: "C",
-		Samples: []Sample{
+		Samples: []model.Sample{
 			{
 				In:  "1",
 				Out: "1",
@@ -67,18 +65,4 @@ func TestSubmitRouteParameter(t *testing.T) {
 	router.ServeHTTP(w, req)
 	log.Println(w.Body.String())
 	assert.Equal(t, 200, w.Code)
-}
-
-func printResult(rt *worker.RunResult) {
-	log.Println(
-		"\n---------------",
-		"\nsampleId:", rt.SampleId,
-		"\nstatus:", rt.Status,
-		"\nexitCode: ", rt.ExitCode,
-		"\nerror: ", rt.Error,
-		"\ntime: ", rt.Time,
-		"\nmemory: ", rt.Memory,
-		"\nrunTime: ", rt.RunningTime,
-		"\nsetUpTime: ", rt.SetUpTime,
-	)
 }
